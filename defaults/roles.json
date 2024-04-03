@@ -1,16 +1,16 @@
 {
     "roles": {
         "site_admin": [
-            "user2@test.ca"
+            "SITE_ADMIN_USER"
         ],
         "site_curator": [
         ],
         "local_team": [
-            "user1@test.ca"
+            "USER1"
         ],
         "mohccn_network": [
-            "user1@test.ca",
-            "user2@test.ca"
+            "USER1",
+            "USER2"
         ]
     }
 }
