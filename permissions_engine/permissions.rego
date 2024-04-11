@@ -89,3 +89,6 @@ else := true
 {
     site_admin
 }
+
+# specifically return the true/false value for the site_admin endpoint
+site_admin := site_admin
