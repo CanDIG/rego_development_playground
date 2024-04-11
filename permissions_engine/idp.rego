@@ -43,7 +43,7 @@ trusted_researcher = true {
 #
 import future.keywords.in
 
-roles = http.send({"method": "get", "url": "VAULT_URL/v1/opa/roles", "headers": {"X-Vault-Token": token}}).body.data.roles
+site_roles = http.send({"method": "get", "url": "VAULT_URL/v1/opa/site_roles", "headers": {"X-Vault-Token": token}}).body.data.site_roles
 site_admin = true {
-    user_key in roles.site_admin
+    user_key in site_roles.admin
 }

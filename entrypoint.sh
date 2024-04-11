@@ -13,9 +13,9 @@ if [[ -f "/app/initial_setup" ]]; then
     sed -i s/CANDIG_USER_KEY/$CANDIG_USER_KEY/ /app/permissions_engine/idp.rego && sed -i s/CANDIG_USER_KEY/$CANDIG_USER_KEY/ /app/permissions_engine/authz.rego
 
     # set up default users in default jsons:
-    sed -i s/SITE_ADMIN_USER/$SITE_ADMIN_USER/ /app/defaults/roles.json
-    sed -i s/USER1/$USER1/ /app/defaults/roles.json
-    sed -i s/USER2/$USER2/ /app/defaults/roles.json
+    sed -i s/SITE_ADMIN_USER/$SITE_ADMIN_USER/ /app/defaults/site_roles.json
+    sed -i s/USER1/$USER1/ /app/defaults/site_roles.json
+    sed -i s/USER2/$USER2/ /app/defaults/site_roles.json
     sed -i s/SITE_ADMIN_USER/$SITE_ADMIN_USER/ /app/defaults/programs.json
     sed -i s/USER1/$USER1/ /app/defaults/programs.json
     sed -i s/USER2/$USER2/ /app/defaults/programs.json

@@ -1,9 +1,9 @@
 {
-    "roles": {
-        "site_admin": [
+    "site_roles": {
+        "admin": [
             "SITE_ADMIN_USER"
         ],
-        "site_curator": [
+        "curator": [
         ],
         "local_team": [
             "USER1"
