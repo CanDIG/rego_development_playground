@@ -43,5 +43,10 @@ except Exception as e:
     print(str(e))
     sys.exit(4)
 
+# initialize pending users
+response, status_code = set_service_store_secret("opa", key="pending_users", value=json.dumps({"pending_users": {}}))
+if status_code != 200:
+    sys.exit(2)
+
 # print(json.dumps(results, indent=4))
 sys.exit(0)
