@@ -5,8 +5,7 @@ package idp
 # Store decode and verified token
 #
 
-import data.store_token.token as token
-keys = http.send({"method": "get", "url": "VAULT_URL/v1/opa/data", "headers": {"X-Vault-Token": token}}).body.data.keys
+import data.vault.keys as keys
 
 decode_verify_token_output[issuer] := output {
     some i
@@ -36,14 +35,4 @@ user_key := decode_verify_token_output[_][2].CANDIG_USER_KEY        # get user k
 #
 trusted_researcher = true {
     decode_verify_token_output[_][2].trusted_researcher == "true"
-}
-
-#
-# This user is a site admin if they have the site_admin role
-#
-import future.keywords.in
-
-site_roles = http.send({"method": "get", "url": "VAULT_URL/v1/opa/site_roles", "headers": {"X-Vault-Token": token}}).body.data.site_roles
-site_admin = true {
-    user_key in site_roles.admin
 }

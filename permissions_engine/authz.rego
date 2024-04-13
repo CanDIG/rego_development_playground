@@ -55,19 +55,18 @@ identity_rights[right] {             # Right is in the identity_rights set if...
     right := rights[role]            # Role has rights defined.
 }
 
-import data.store_token.token as vault_token
+import data.vault.site_roles as site_roles
+import data.vault.keys as keys
 
 # If user is site_admin, allow always
 import future.keywords.in
 
-site_roles = http.send({"method": "get", "url": "VAULT_URL/v1/opa/site_roles", "headers": {"X-Vault-Token": vault_token}}).body.data.site_roles
 user_key := decode_verify_token_output[_][2].CANDIG_USER_KEY        # get user key from the token payload
 
 allow {
     user_key in site_roles.admin
 }
 
-keys = http.send({"method": "get", "url": "VAULT_URL/v1/opa/data", "headers": {"X-Vault-Token": vault_token}}).body.data.keys
 decode_verify_token_output[issuer] := output {
     some i
     issuer := keys[i].iss

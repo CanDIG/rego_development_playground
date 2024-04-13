@@ -3,7 +3,6 @@ package permissions
 # This is the set of policy definitions for the permissions engine.
 #
 
-import data.store_token.token as token
 #
 # Provided:
 # input = {
@@ -15,7 +14,6 @@ import data.store_token.token as token
 #
 import data.idp.valid_token
 import data.idp.user_key
-import data.idp.site_admin
 
 #
 # what programs are available to this user?
@@ -23,11 +21,8 @@ import data.idp.site_admin
 
 import future.keywords.in
 
-all_programs = http.send({"method": "get", "url": "VAULT_URL/v1/opa/programs", "headers": {"X-Vault-Token": token}}).body.data.programs
-program_auths[p] := program {
-    some p in all_programs
-    program := http.send({"method": "get", "url": concat("/", ["VAULT_URL/v1/opa/programs", p]) , "headers": {"X-Vault-Token": token}}).body.data[p]
-}
+import data.vault.all_programs as all_programs
+import data.vault.program_auths as program_auths
 
 readable_programs[p] {
     some p in all_programs
@@ -39,7 +34,7 @@ curateable_programs[p] {
     user_key in program_auths[p].program_curators
 }
 
-paths = http.send({"method": "get", "url": "VAULT_URL/v1/opa/paths", "headers": {"X-Vault-Token": token}}).body.data.paths
+import data.vault.paths as paths
 
 # which datasets can this user see for this method, path
 default datasets = []
@@ -90,5 +85,10 @@ else := true
     site_admin
 }
 
-# specifically return the true/false value for the site_admin endpoint
-site_admin := site_admin
+#
+# This user is a site admin if they have the site_admin role
+#
+import data.vault.site_roles as site_roles
+site_admin = true {
+    user_key in site_roles.admin
+}

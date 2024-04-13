@@ -24,11 +24,8 @@ if [[ -f "/app/initial_setup" ]]; then
     sed -i s/OPA_SERVICE_TOKEN/$OPA_SERVICE_TOKEN/ /app/permissions_engine/authz.rego
     sed -i s/OPA_ROOT_TOKEN/$OPA_ROOT_TOKEN/ /app/permissions_engine/authz.rego
 
-    # set up vault URL everywhere
-    sed -i s@VAULT_URL@$VAULT_URL@ /app/permissions_engine/authz.rego
-    sed -i s@VAULT_URL@$VAULT_URL@ /app/permissions_engine/service.rego
-    sed -i s@VAULT_URL@$VAULT_URL@ /app/permissions_engine/idp.rego
-    sed -i s@VAULT_URL@$VAULT_URL@ /app/permissions_engine/permissions.rego
+    # set up vault URL
+    sed -i s@VAULT_URL@$VAULT_URL@ /app/permissions_engine/vault.rego
 
     echo "initializing stores"
     python3 /app/initialize_vault_store.py
