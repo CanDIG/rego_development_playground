@@ -23,12 +23,27 @@ import future.keywords.in
 
 import data.vault.all_programs as all_programs
 import data.vault.program_auths as program_auths
+import data.vault.user_programs as user_programs
 
-readable_programs[p] {
-    some p in all_programs
-    user_key in program_auths[p].team_members
+# compile list of programs specifically authorized for the user by DACs and within the authorized time period
+user_readable_programs[p["program_id"]] := output {
+    some p in user_programs
+    time.parse_ns("2006-01-02", p["start_date"]) <= time.now_ns()
+    time.parse_ns("2006-01-02", p["end_date"]) >= time.now_ns()
+    output := p
 }
 
+# compile list of programs that list the user as a team member
+team_readable_programs[p] := output {
+    some p in all_programs
+    user_key in program_auths[p].team_members
+    output := program_auths[p].team_members
+}
+
+# user can read programs that are either team-readable or user-readable
+readable_programs := object.keys(object.union(team_readable_programs, user_readable_programs))
+
+# user can curate programs that list the user as a program curator
 curateable_programs[p] {
     some p in all_programs
     user_key in program_auths[p].program_curators

@@ -24,3 +24,11 @@ program_auths[p] := program {
     some p in all_programs
     program := http.send({"method": "get", "url": concat("/", ["VAULT_URL/v1/opa/programs", p]) , "headers": {"X-Vault-Token": vault_token}}).body.data[p]
 }
+
+# check to see if the user is authorized for any other programs via DACs
+user_auth = http.send({"method": "get", "url": concat("/", ["VAULT_URL/v1/opa/users", urlquery.encode(user_key)]), "headers": {"X-Vault-Token": vault_token}, "raise_error": false})
+
+default user_programs = []
+user_programs = user_auth.body.data.programs {
+    user_auth.status_code = 200
+}
