@@ -3,14 +3,15 @@
 set -Euo pipefail
 
 OPA_ROOT_TOKEN=$(cat /run/secrets/opa-root-token)
+OPA_SERVICE_TOKEN=$(cat /run/secrets/opa-service-token)
 SITE_ADMIN_USER=$(cat /run/secrets/site_admin_name)
 USER1=$(cat /run/secrets/user1_name)
 USER2=$(cat /run/secrets/user2_name)
 
 if [[ -f "/app/initial_setup" ]]; then
     # set up our default values
-    sed -i s/CLIENT_ID/$KEYCLOAK_CLIENT_ID/ /app/permissions_engine/idp.rego && sed -i s/CLIENT_ID/$KEYCLOAK_CLIENT_ID/ /app/permissions_engine/authz.rego
-    sed -i s/CANDIG_USER_KEY/$CANDIG_USER_KEY/ /app/permissions_engine/idp.rego && sed -i s/CANDIG_USER_KEY/$CANDIG_USER_KEY/ /app/permissions_engine/authz.rego
+    sed -i s/CLIENT_ID/$KEYCLOAK_CLIENT_ID/ /app/permissions_engine/idp.rego
+    sed -i s/CANDIG_USER_KEY/$CANDIG_USER_KEY/ /app/permissions_engine/idp.rego
 
     # set up default users in default jsons:
     sed -i s/SITE_ADMIN_USER/$SITE_ADMIN_USER/ /app/defaults/site_roles.json
@@ -20,7 +21,6 @@ if [[ -f "/app/initial_setup" ]]; then
     sed -i s/USER1/$USER1/ /app/defaults/programs.json
     sed -i s/USER2/$USER2/ /app/defaults/programs.json
 
-    OPA_SERVICE_TOKEN=$(cat /run/secrets/opa-service-token)
     sed -i s/OPA_SERVICE_TOKEN/$OPA_SERVICE_TOKEN/ /app/permissions_engine/authz.rego
     sed -i s/OPA_ROOT_TOKEN/$OPA_ROOT_TOKEN/ /app/permissions_engine/authz.rego
 

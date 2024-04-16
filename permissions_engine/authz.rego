@@ -55,32 +55,6 @@ identity_rights[right] {             # Right is in the identity_rights set if...
     right := rights[role]            # Role has rights defined.
 }
 
-import data.vault.site_roles as site_roles
-import data.vault.keys as keys
-
-# If user is site_admin, allow always
-import future.keywords.in
-
-user_key := decode_verify_token_output[_][2].CANDIG_USER_KEY        # get user key from the token payload
-
-allow {
-    user_key in site_roles.admin
-}
-
-decode_verify_token_output[issuer] := output {
-    some i
-    issuer := keys[i].iss
-    cert := keys[i].cert
-    output := io.jwt.decode_verify(     # Decode and verify in one-step
-        input.identity,
-        {                         # With the supplied constraints:
-            "cert": cert,
-            "iss": issuer,
-            "aud": "CLIENT_ID"
-        }
-    )
-}
-
 # Any service should be able to verify that a service is who it says it is:
 allow {
     input.path == ["v1", "data", "service", "verified"]
