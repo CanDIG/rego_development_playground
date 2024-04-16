@@ -1,3 +1,3 @@
 requests
 jq
-candigv2-authx@git+https://github.com/CanDIG/candigv2-authx.git@v2.2.1
+candigv2-authx@git+https://github.com/CanDIG/candigv2-authx.git@daisieh/aud

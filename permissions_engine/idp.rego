@@ -11,12 +11,13 @@ decode_verify_token_output[issuer] := output {
     some i
     issuer := keys[i].iss
     cert := keys[i].cert
+    aud := keys[i].aud[_]
     output := io.jwt.decode_verify(     # Decode and verify in one-step
         input.token,
         {                         # With the supplied constraints:
             "cert": cert,
             "iss": issuer,
-            "aud": "CLIENT_ID"
+            "aud": aud
         }
     )
 }

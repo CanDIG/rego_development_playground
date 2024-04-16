@@ -10,7 +10,6 @@ USER2=$(cat /run/secrets/user2_name)
 
 if [[ -f "/app/initial_setup" ]]; then
     # set up our default values
-    sed -i s/CLIENT_ID/$KEYCLOAK_CLIENT_ID/ /app/permissions_engine/idp.rego
     sed -i s/CANDIG_USER_KEY/$CANDIG_USER_KEY/ /app/permissions_engine/idp.rego
 
     # set up default users in default jsons:
