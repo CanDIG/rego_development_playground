@@ -6,6 +6,7 @@ package idp
 #
 
 import data.vault.keys as keys
+import future.keywords.in
 
 decode_verify_token_output[issuer] := output {
     some i
@@ -36,4 +37,11 @@ user_key := decode_verify_token_output[_][2].CANDIG_USER_KEY        # get user k
 #
 trusted_researcher = true {
     decode_verify_token_output[_][2].trusted_researcher == "true"
+}
+
+#
+# If the issuer in the token is the same as the first listed in keys, this is issued by the local issuer
+#
+is_local_token = true {
+    keys[i].iss in object.keys(decode_verify_token_output)
 }
