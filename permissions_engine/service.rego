@@ -8,3 +8,5 @@ import data.vault.service_token as service_token
 verified {
     service_token == input.token
 }
+
+service-info := "opa service is running"

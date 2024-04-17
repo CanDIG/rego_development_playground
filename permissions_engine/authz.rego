@@ -60,3 +60,9 @@ allow {
     input.path == ["v1", "data", "service", "verified"]
     input.method == "POST"
 }
+
+# Service-info path for healthcheck
+allow {
+    input.path == ["v1", "data", "service", "service-info"]
+    input.method == "GET"
+}
