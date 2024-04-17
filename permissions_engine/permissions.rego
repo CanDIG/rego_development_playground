@@ -65,7 +65,7 @@ else := curateable_programs
 {
     valid_token
     input.body.method = "GET"
-    regex.match(paths.read.get[_], input.body.path) == true
+    regex.match(paths.curate.get[_], input.body.path) == true
 }
 
 else := curateable_programs
