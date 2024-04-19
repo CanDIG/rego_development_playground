@@ -36,6 +36,25 @@ curateable_programs[p] {
 
 import data.vault.paths as paths
 
+# debugging
+valid_token := valid_token
+readable_get[p] := output {
+    some p in paths.read.get
+    output := regex.match(p, input.body.path)
+}
+readable_post[p] := output {
+    some p in paths.read.post
+    output := regex.match(p, input.body.path)
+}
+curateable_get[p] := output {
+    some p in paths.curate.get
+    output := regex.match(p, input.body.path)
+}
+curateable_post[p] := output {
+    some p in paths.curate.post
+    output := regex.match(p, input.body.path)
+}
+
 # which datasets can this user see for this method, path
 default datasets = []
 
