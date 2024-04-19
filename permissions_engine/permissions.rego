@@ -14,12 +14,19 @@ package permissions
 #
 import data.idp.valid_token
 import data.idp.user_key
+import future.keywords.in
+
+#
+# This user is a site admin if they have the site_admin role
+#
+import data.vault.site_roles as site_roles
+site_admin = true {
+    user_key in site_roles.admin
+}
 
 #
 # what programs are available to this user?
 #
-
-import future.keywords.in
 
 import data.vault.all_programs as all_programs
 import data.vault.program_auths as program_auths
@@ -119,10 +126,3 @@ else := true
     site_admin
 }
 
-#
-# This user is a site admin if they have the site_admin role
-#
-import data.vault.site_roles as site_roles
-site_admin = true {
-    user_key in site_roles.admin
-}
