@@ -1,0 +1,23 @@
+name: Github Actions Test
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.12"]
+    env:
+      CANDIG_URL: "http://localhost"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Build Docker image
+        run: docker image build --build-arg venv_python=${{ matrix.python-version }} --iidfile image.txt .
+      - name: Test with pytest
+        run: docker run `cat image.txt`
