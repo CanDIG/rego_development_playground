@@ -3,7 +3,7 @@ import os
 from authx.auth import set_service_store_secret, add_provider_to_opa, add_program_to_opa
 import sys
 
-## Initializes Vault's opa service store with the information for our IDP and the data in roles.json, paths.json, programs.json
+## Initializes Vault's opa service store with the information for our IDP and the data in site_roles.json, paths.json, programs.json
 
 results = []
 
@@ -25,9 +25,9 @@ try:
             sys.exit(3)
         results.append(response)
 
-    with open('/app/defaults/roles.json') as f:
+    with open('/app/defaults/site_roles.json') as f:
         data = f.read()
-        response, status_code = set_service_store_secret("opa", key="roles", value=data)
+        response, status_code = set_service_store_secret("opa", key="site_roles", value=data)
         if status_code != 200:
             sys.exit(2)
         results.append(response)

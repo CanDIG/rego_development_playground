@@ -28,6 +28,10 @@ USER candig
 
 WORKDIR /app/
 
+RUN curl -L -o opa https://openpolicyagent.org/downloads/v0.63.0/opa_linux_amd64_static
+
+RUN chmod 755 ./opa
+
 RUN touch /app/initial_setup
 
 ENTRYPOINT ["bash", "/app/entrypoint.sh"]

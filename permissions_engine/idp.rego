@@ -5,19 +5,20 @@ package idp
 # Store decode and verified token
 #
 
-import data.store_token.token as token
-keys = http.send({"method": "get", "url": "VAULT_URL/v1/opa/data", "headers": {"X-Vault-Token": token}}).body.data.keys
+import data.vault.keys as keys
+import future.keywords.in
 
 decode_verify_token_output[issuer] := output {
     some i
     issuer := keys[i].iss
     cert := keys[i].cert
+    aud := keys[i].aud[_]
     output := io.jwt.decode_verify(     # Decode and verify in one-step
         input.token,
         {                         # With the supplied constraints:
             "cert": cert,
             "iss": issuer,
-            "aud": "CLIENT_ID"
+            "aud": aud
         }
     )
 }
@@ -39,11 +40,8 @@ trusted_researcher = true {
 }
 
 #
-# This user is a site admin if they have the site_admin role
+# If the issuer in the token is the same as the first listed in keys, this is issued by the local issuer
 #
-import future.keywords.in
-
-roles = http.send({"method": "get", "url": "VAULT_URL/v1/opa/roles", "headers": {"X-Vault-Token": token}}).body.data.roles
-site_admin = true {
-    user_key in roles.site_admin
+is_local_token = true {
+    keys[i].iss in object.keys(decode_verify_token_output)
 }

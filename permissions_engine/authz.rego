@@ -13,6 +13,9 @@ rights = {
     "allowed": {
         "path": ["v1", "data", "permissions", "allowed"]
     },
+    "site_admin": {
+        "path": ["v1", "data", "permissions", "site_admin"]
+    },
     "tokenControlledAccessREMS": {
         "path": ["v1", "data", "ga4ghPassport", "tokenControlledAccessREMS"]
     }
@@ -26,7 +29,7 @@ tokens = {
         "roles": ["admin"]
     },
     service_token : {
-        "roles": ["datasets", "allowed", "tokenControlledAccessREMS"]
+        "roles": ["datasets", "allowed", "site_admin", "tokenControlledAccessREMS"]
     }
 }
 
@@ -52,35 +55,14 @@ identity_rights[right] {             # Right is in the identity_rights set if...
     right := rights[role]            # Role has rights defined.
 }
 
-import data.store_token.token as vault_token
-
-# If user is site_admin, allow always
-import future.keywords.in
-
-roles = http.send({"method": "get", "url": "VAULT_URL/v1/opa/roles", "headers": {"X-Vault-Token": vault_token}}).body.data.roles
-user_key := decode_verify_token_output[_][2].CANDIG_USER_KEY        # get user key from the token payload
-
-allow {
-    user_key in roles.site_admin
-}
-
-keys = http.send({"method": "get", "url": "VAULT_URL/v1/opa/data", "headers": {"X-Vault-Token": vault_token}}).body.data.keys
-decode_verify_token_output[issuer] := output {
-    some i
-    issuer := keys[i].iss
-    cert := keys[i].cert
-    output := io.jwt.decode_verify(     # Decode and verify in one-step
-        input.identity,
-        {                         # With the supplied constraints:
-            "cert": cert,
-            "iss": issuer,
-            "aud": "CLIENT_ID"
-        }
-    )
-}
-
 # Any service should be able to verify that a service is who it says it is:
 allow {
     input.path == ["v1", "data", "service", "verified"]
     input.method == "POST"
+}
+
+# Service-info path for healthcheck
+allow {
+    input.path == ["v1", "data", "service", "service-info"]
+    input.method == "GET"
 }

@@ -7,13 +7,7 @@ opa_url = os.environ.get('OPA_URL')
 
 def perform_healthcheck():
     try:
-        body = {
-            "input": {
-                "service": "opa",
-                "token": "token" # this isn't important; even if it's wrong, it returns 200
-            }
-        }
-        response = requests.post(f"{opa_url}/v1/data/service/verified", json=body)
+        response = requests.get(f"{opa_url}/v1/data/service/service-info")
         response.raise_for_status()
         print("Health check passed!")
         return True
