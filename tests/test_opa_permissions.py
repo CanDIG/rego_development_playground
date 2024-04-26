@@ -315,6 +315,17 @@ def get_curation_allowed():
             },
             True
         ),
+        ( # user1 can curate the datasets it's a curator of
+            "user1",
+            {
+                "body": {
+                  "path": "/ga4gh/drs/v1/cohorts/",
+                  "method": "DELETE",
+                  "program": "SYNTHETIC-1"
+                }
+            },
+            True
+        ),
         ( # user1 cannot curate the datasets it's not a curator of
             "user1",
             {

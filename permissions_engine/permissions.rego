@@ -116,6 +116,13 @@ else := curateable_programs
     regex.match(paths.curate.post[_], input.body.path) == true
 }
 
+else := curateable_programs
+{
+    valid_token
+    input.body.method = "DELETE"
+    regex.match(paths.curate.delete[_], input.body.path) == true
+}
+
 # convenience path: if a specific program is in the body, allowed = true if that program is in datasets
 allowed := true
 {
