@@ -30,6 +30,11 @@
                 "/ingest/?.*",
                 "/ga4gh/drs/v1/?.*",
                 "/v2/ingest/?.*"
+            ],
+            "delete": [
+                "/ingest/?.*",
+                "/ga4gh/drs/v1/?.*",
+                "/v2/ingest/?.*"
             ]
         }
     }

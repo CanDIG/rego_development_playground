@@ -34,4 +34,4 @@ RUN chmod 755 ./opa
 
 RUN touch /app/initial_setup
 
-ENTRYPOINT ["bash", "/app/entrypoint.sh"]
+ENTRYPOINT pytest
