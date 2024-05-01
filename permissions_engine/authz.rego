@@ -16,6 +16,9 @@ rights = {
     "site_admin": {
         "path": ["v1", "data", "permissions", "site_admin"]
     },
+    "user_id": {
+        "path": ["v1", "data", "idp", "user_key"]
+    },
     "tokenControlledAccessREMS": {
         "path": ["v1", "data", "ga4ghPassport", "tokenControlledAccessREMS"]
     }
@@ -29,7 +32,7 @@ tokens = {
         "roles": ["admin"]
     },
     service_token : {
-        "roles": ["datasets", "allowed", "site_admin", "tokenControlledAccessREMS"]
+        "roles": ["datasets", "allowed", "site_admin", "user_id", "tokenControlledAccessREMS"]
     }
 }
 
