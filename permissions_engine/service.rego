@@ -3,11 +3,10 @@ package service
 # Verifies that a service is who it says it is
 #
 
-import data.store_token.token as token
-
-url = concat("/", ["VAULT_URL/v1", input.service, "token", input.token])
-service_token = http.send({"method": "get", "url": url, "headers": {"X-Vault-Token": token}}).body.data.token
+import data.vault.service_token as service_token
 
 verified {
     service_token == input.token
 }
+
+service-info := "opa service is running"

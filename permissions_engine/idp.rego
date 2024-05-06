@@ -5,19 +5,20 @@ package idp
 # Store decode and verified token
 #
 
-import data.store_token.token as token
-keys = http.send({"method": "get", "url": "http://vault:8200/v1/opa/data", "headers": {"X-Vault-Token": token}}).body.data.keys
+import data.vault.keys as keys
+import future.keywords.in
 
 decode_verify_token_output[issuer] := output {
     some i
     issuer := keys[i].iss
     cert := keys[i].cert
+    aud := keys[i].aud[_]
     output := io.jwt.decode_verify(     # Decode and verify in one-step
         input.token,
         {                         # With the supplied constraints:
             "cert": cert,
             "iss": issuer,
-            "aud": "CLIENT_ID"
+            "aud": aud
         }
     )
 }
@@ -29,6 +30,8 @@ valid_token = true {
     decode_verify_token_output[_][0]
 }
 
+user_key := decode_verify_token_output[_][2].CANDIG_USER_KEY        # get user key from the token payload
+
 #
 # Check trusted_researcher in the token payload
 #
@@ -37,10 +40,8 @@ trusted_researcher = true {
 }
 
 #
-# Check OPA_SITE_ADMIN_KEY in the token payload
+# If the issuer in the token is the same as the first listed in keys, this is issued by the local issuer
 #
-OPA_SITE_ADMIN_KEY = true {
-    decode_verify_token_output[_][2].realm_access.roles[_] == "OPA_SITE_ADMIN_KEY"
+is_local_token = true {
+    keys[i].iss in object.keys(decode_verify_token_output)
 }
-
-email := decode_verify_token_output[_][2].email        # get email from the token payload

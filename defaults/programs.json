@@ -1,0 +1,14 @@
+{
+    "SYNTHETIC-1": {
+        "program_id": "SYNTHETIC-1",
+        "program_curators": ["USER1"],
+        "team_members": ["USER1"],
+        "date_created": "2020-01-01"
+    },
+    "SYNTHETIC-2": {
+        "program_id": "SYNTHETIC-2",
+        "program_curators": ["USER2"],
+        "team_members": ["USER2"],
+        "date_created": "2020-03-01"
+    }
+}

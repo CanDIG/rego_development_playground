@@ -3,71 +3,133 @@ package permissions
 # This is the set of policy definitions for the permissions engine.
 #
 
-default datasets = []
-
-import data.store_token.token as token
-access = http.send({"method": "get", "url": "http://vault:8200/v1/opa/access", "headers": {"X-Vault-Token": token}}).body.data.access
-
-paths = http.send({"method": "get", "url": "http://vault:8200/v1/opa/paths", "headers": {"X-Vault-Token": token}}).body.data.paths
-
-get_input_paths = paths.get
-post_input_paths = paths.post
-
 #
 # Provided:
 # input = {
 #     'token': user token
 #     'method': method requested at data service
 #     'path': path to request at data service
+#     'program': name of program (optional)
 # }
 #
 import data.idp.valid_token
-import data.idp.trusted_researcher
-import data.idp.email
+import data.idp.user_key
+import future.keywords.in
 
 #
-# is registered access allowed?
-# TODO: decide on claim we're using for registered access
+# This user is a site admin if they have the site_admin role
 #
-
-default registered_allowed = []
-
-registered_allowed = access.registered_datasets {
-    valid_token         # extant, valid token
-    trusted_researcher  # has claim we're using for registered access
+import data.vault.site_roles as site_roles
+site_admin = true {
+    user_key in site_roles.admin
 }
 
 #
-# what controlled access datasets are allowed?
+# what programs are available to this user?
 #
 
-default controlled_allowed = []
+import data.vault.all_programs as all_programs
+import data.vault.program_auths as program_auths
+import data.vault.user_programs as user_programs
 
-controlled_allowed = access.controlled_access_list[email]{
-    valid_token                  # extant, valid token
+# compile list of programs specifically authorized for the user by DACs and within the authorized time period
+user_readable_programs[p["program_id"]] := output {
+    some p in user_programs
+    time.parse_ns("2006-01-02", p["start_date"]) <= time.now_ns()
+    time.parse_ns("2006-01-02", p["end_date"]) >= time.now_ns()
+    output := p
 }
 
-#
-# List of all allowed datasets for requests coming from Katsu
-#
+# compile list of programs that list the user as a team member
+team_readable_programs[p] := output {
+    some p in all_programs
+    user_key in program_auths[p].team_members
+    output := program_auths[p].team_members
+}
 
-# allowed datasets
-datasets = array.concat(array.concat(access.open_datasets, registered_allowed), controlled_allowed)
+# user can read programs that are either team-readable or user-readable
+readable_programs := object.keys(object.union(team_readable_programs, user_readable_programs))
+
+# user can curate programs that list the user as a program curator
+curateable_programs[p] {
+    some p in all_programs
+    user_key in program_auths[p].program_curators
+}
+
+import data.vault.paths as paths
+
+# debugging
+valid_token := valid_token
+readable_get[p] := output {
+    some p in paths.read.get
+    output := regex.match(p, input.body.path)
+}
+readable_post[p] := output {
+    some p in paths.read.post
+    output := regex.match(p, input.body.path)
+}
+curateable_get[p] := output {
+    some p in paths.curate.get
+    output := regex.match(p, input.body.path)
+}
+curateable_post[p] := output {
+    some p in paths.curate.post
+    output := regex.match(p, input.body.path)
+}
+
+# which datasets can this user see for this method, path
+default datasets = []
+
+# site admins can see all programs
+datasets := all_programs
 {
+    site_admin
+}
+
+# if user is a team_member, they can access programs that allow read access for this method, path
+else := readable_programs
+{
+    valid_token
     input.body.method = "GET"
-    regex.match(get_input_paths[_], input.body.path) == true
+    regex.match(paths.read.get[_], input.body.path) == true
 }
 
-datasets = array.concat(array.concat(access.open_datasets, registered_allowed), controlled_allowed)
+else := readable_programs
 {
+    valid_token
     input.body.method = "POST"
-    regex.match(post_input_paths[_], input.body.path) == true
+    regex.match(paths.read.post[_], input.body.path) == true
 }
 
-# allowed datasets for counting
-datasets = array.concat(access.open_datasets, access.opt_in_datasets) {
-    valid_token == true
-    input.method = "GET"
-    regex.match(get_input_paths[_], input.body.path) == true
-    input.query_type = "counts"
+# if user is a program_curator, they can access programs that allow curate access for this method, path
+else := curateable_programs
+{
+    valid_token
+    input.body.method = "GET"
+    regex.match(paths.curate.get[_], input.body.path) == true
 }
+
+else := curateable_programs
+{
+    valid_token
+    input.body.method = "POST"
+    regex.match(paths.curate.post[_], input.body.path) == true
+}
+
+else := curateable_programs
+{
+    valid_token
+    input.body.method = "DELETE"
+    regex.match(paths.curate.delete[_], input.body.path) == true
+}
+
+# convenience path: if a specific program is in the body, allowed = true if that program is in datasets
+allowed := true
+{
+    input.body.program in datasets
+}
+else := true
+{
+    site_admin
+}
+

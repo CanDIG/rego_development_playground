@@ -1,0 +1,17 @@
+{
+    "site_roles": {
+        "admin": [
+            "SITE_ADMIN_USER"
+        ],
+        "curator": [
+        ],
+        "local_team": [
+            "USER1"
+        ],
+        "mohccn_network": [
+            "USER1",
+            "USER2"
+        ]
+    }
+}
+

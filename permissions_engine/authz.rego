@@ -10,6 +10,15 @@ rights = {
     "datasets": {
         "path": ["v1", "data", "permissions", "datasets"]
     },
+    "allowed": {
+        "path": ["v1", "data", "permissions", "allowed"]
+    },
+    "site_admin": {
+        "path": ["v1", "data", "permissions", "site_admin"]
+    },
+    "user_id": {
+        "path": ["v1", "data", "idp", "user_key"]
+    },
     "tokenControlledAccessREMS": {
         "path": ["v1", "data", "ga4ghPassport", "tokenControlledAccessREMS"]
     }
@@ -23,7 +32,7 @@ tokens = {
         "roles": ["admin"]
     },
     service_token : {
-        "roles": ["datasets", "tokenControlledAccessREMS"]
+        "roles": ["datasets", "allowed", "site_admin", "user_id", "tokenControlledAccessREMS"]
     }
 }
 
@@ -49,30 +58,14 @@ identity_rights[right] {             # Right is in the identity_rights set if...
     right := rights[role]            # Role has rights defined.
 }
 
-# If token payload has OPA_SITE_ADMIN_KEY in it, allow always
-allow {
-    decode_verify_token_output[_][2].realm_access.roles[_] == "OPA_SITE_ADMIN_KEY"
-}
-
-import data.store_token.token as token
-keys = http.send({"method": "get", "url": "VAULT_URL/v1/opa/data", "headers": {"X-Vault-Token": token}}).body.data.keys
-
-decode_verify_token_output[issuer] := output {
-    some i
-    issuer := keys[i].iss
-    cert := keys[i].cert
-    output := io.jwt.decode_verify(     # Decode and verify in one-step
-        input.identity,
-        {                         # With the supplied constraints:
-            "cert": cert,
-            "iss": issuer,
-            "aud": "CLIENT_ID"
-        }
-    )
-}
-
 # Any service should be able to verify that a service is who it says it is:
 allow {
     input.path == ["v1", "data", "service", "verified"]
     input.method == "POST"
+}
+
+# Service-info path for healthcheck
+allow {
+    input.path == ["v1", "data", "service", "service-info"]
+    input.method == "GET"
 }
