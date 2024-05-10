@@ -12,8 +12,8 @@ package permissions
 #     'program': name of program (optional)
 # }
 #
-import data.idp.valid_token
-import data.idp.user_key
+import data.idp.valid_token as valid_token
+import data.idp.user_key as user_key
 import future.keywords.in
 
 #
