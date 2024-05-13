@@ -4,9 +4,6 @@ set -Euo pipefail
 
 OPA_ROOT_TOKEN=$(cat /run/secrets/opa-root-token)
 OPA_SERVICE_TOKEN=$(cat /run/secrets/opa-service-token)
-SITE_ADMIN_USER=$(cat /run/secrets/site_admin_name)
-USER1=$(cat /run/secrets/user1_name)
-USER2=$(cat /run/secrets/user2_name)
 
 if [[ -f "/app/initial_setup" ]]; then
     # set up our default values
