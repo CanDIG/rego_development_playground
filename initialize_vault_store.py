@@ -14,7 +14,7 @@ try:
             response = add_provider_to_opa(token, os.getenv("KEYCLOAK_REALM_URL"))
             results.append(response)
         except Exception as e:
-            print(str(e))
+            raise Exception(f"failed to save idp keys: {str(e)} {status_code}")
             sys.exit(1)
 
     response, status_code = get_service_store_secret("opa", key="paths")
@@ -23,7 +23,7 @@ try:
             data = f.read()
             response, status_code = set_service_store_secret("opa", key="paths", value=data)
             if status_code != 200:
-                sys.exit(3)
+                raise Exception(f"failed to save paths: {str(e)} {status_code}")
             results.append(response)
 
     response, status_code = get_service_store_secret("opa", key="site_roles")
@@ -32,7 +32,7 @@ try:
             data = f.read()
             response, status_code = set_service_store_secret("opa", key="site_roles", value=data)
             if status_code != 200:
-                sys.exit(2)
+                raise Exception(f"failed to save site roles: {str(e)} {status_code}")
             results.append(response)
 
     current_programs, status_code = list_programs_in_opa()
@@ -44,7 +44,7 @@ try:
             if programs[program] not in current_programs:
                 response, status_code = add_program_to_opa(programs[program])
                 if status_code != 200:
-                    sys.exit(2)
+                    raise Exception(f"failed to save program authz: {str(e)} {status_code}")
                 results.append(response)
 except Exception as e:
     print(str(e))
