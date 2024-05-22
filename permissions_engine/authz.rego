@@ -69,3 +69,8 @@ allow {
     input.path == ["v1", "data", "service", "service-info"]
     input.method == "GET"
 }
+
+# Site admin should be able to see anything
+allow {
+    data.permissions.site_admin == true
+}
