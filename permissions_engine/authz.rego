@@ -82,3 +82,11 @@ allow {
     data.permissions.valid_token == true
     input.body.input.token == input.identity
 }
+
+# As long as the user is authorized, should be able to see if they're allowed to view something
+allow {
+    input.path == ["v1", "data", "permissions", "allowed"]
+    input.method == "POST"
+    data.permissions.valid_token == true
+    input.body.input.token == input.identity
+}
