@@ -74,3 +74,11 @@ allow {
 allow {
     data.permissions.site_admin == true
 }
+
+# As long as the user is authorized, should be able to get their own datasets
+allow {
+    input.path == ["v1", "data", "permissions", "datasets"]
+    input.method == "POST"
+    data.permissions.valid_token == true
+    input.body.input.token == input.identity
+}
