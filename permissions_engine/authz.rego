@@ -3,8 +3,12 @@ package system.authz
 # this defines authentication to have access to opa at all
 # from: https://www.openpolicyagent.org/docs/v0.22.0/security/#token-based-authentication-example
 
-default allow = false               # Reject requests by default.
+# Reject requests by default
+default allow = false
 
+# Site admin should be able to see anything
+allow {
+    data.permissions.site_admin == true
 }
 
 # Any service should be able to verify that a service is who it says it is:
@@ -24,11 +28,6 @@ allow {
 allow {
     input.path == ["v1", "data", "service", "service-info"]
     input.method == "GET"
-}
-
-# Site admin should be able to see anything
-allow {
-    data.permissions.site_admin == true
 }
 
 # The authx library uses these paths:
