@@ -31,17 +31,18 @@ allow {
     data.permissions.site_admin == true
 }
 
-# As long as the user is authorized, should be able to get their own datasets
-allow {
-    input.path == ["v1", "data", "permissions", "datasets"]
-    input.method == "POST"
-    data.permissions.valid_token == true
-    input.body.input.token == input.identity
+# The authx library uses these paths:
+authx_paths = {
+    "datasets": ["v1", "data", "permissions", "datasets"],
+    "allowed": ["v1", "data", "permissions", "allowed"],
+    "site_admin": ["v1", "data", "permissions", "site_admin"],
+    "user_id": ["v1", "data", "idp", "user_key"]
 }
 
-# As long as the user is authorized, should be able to see if they're allowed to view something
+# An authorized user has a valid token (and passes in that same token for both bearer and body)
+# Authz users can access the authx paths
 allow {
-    input.path == ["v1", "data", "permissions", "allowed"]
+    input.path == authx_paths[_]
     input.method == "POST"
     data.permissions.valid_token == true
     input.body.input.token == input.identity
