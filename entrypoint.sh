@@ -2,8 +2,6 @@
 
 set -Euo pipefail
 
-OPA_ROOT_TOKEN=$(cat /run/secrets/opa-root-token)
-OPA_SERVICE_TOKEN=$(cat /run/secrets/opa-service-token)
 
 if [[ -f "/app/initial_setup" ]]; then
     # set up our default values
@@ -17,9 +15,8 @@ if [[ -f "/app/initial_setup" ]]; then
     sed -i s/USER1/$USER1/ /app/defaults/programs.json
     sed -i s/USER2/$USER2/ /app/defaults/programs.json
 
-    sed -i s/OPA_SERVICE_TOKEN/$OPA_SERVICE_TOKEN/ /app/permissions_engine/authz.rego
-    sed -i s/OPA_ROOT_TOKEN/$OPA_ROOT_TOKEN/ /app/permissions_engine/authz.rego
-
+    token=$(dd if=/dev/urandom bs=1 count=16 2>/dev/null | base64 | tr -d '\n\r+' | sed s/[^A-Za-z0-9]//g)
+    echo { \"opa_secret\": \"$token\" } > /app/permissions_engine/opa_secret.json
     # set up vault URL
     sed -i s@VAULT_URL@$VAULT_URL@ /app/permissions_engine/vault.rego
 

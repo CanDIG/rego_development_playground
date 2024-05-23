@@ -64,6 +64,13 @@ allow {
     input.method == "POST"
 }
 
+# Opa should be able to store its vault token
+allow {
+    input.path == ["v1", "data", "store_token"]
+    input.method == "PUT"
+    input.headers["X-Opa"][_] == data.opa_secret
+}
+
 # Service-info path for healthcheck
 allow {
     input.path == ["v1", "data", "service", "service-info"]
