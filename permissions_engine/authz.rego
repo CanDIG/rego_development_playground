@@ -3,59 +3,12 @@ package system.authz
 # this defines authentication to have access to opa at all
 # from: https://www.openpolicyagent.org/docs/v0.22.0/security/#token-based-authentication-example
 
-rights = {
-    "admin": {
-        "path": "*"
-    },
-    "datasets": {
-        "path": ["v1", "data", "permissions", "datasets"]
-    },
-    "allowed": {
-        "path": ["v1", "data", "permissions", "allowed"]
-    },
-    "site_admin": {
-        "path": ["v1", "data", "permissions", "site_admin"]
-    },
-    "user_id": {
-        "path": ["v1", "data", "idp", "user_key"]
-    },
-    "tokenControlledAccessREMS": {
-        "path": ["v1", "data", "ga4ghPassport", "tokenControlledAccessREMS"]
-    }
-}
+# Reject requests by default
+default allow = false
 
-root_token := "OPA_ROOT_TOKEN"
-service_token := "OPA_SERVICE_TOKEN"
-
-tokens = {
-    root_token : {
-        "roles": ["admin"]
-    },
-    service_token : {
-        "roles": ["datasets", "allowed", "site_admin", "user_id", "tokenControlledAccessREMS"]
-    }
-}
-
-default allow = false               # Reject requests by default.
-
-allow {                             # Allow request if...
-    some right
-    identity_rights[right]          # Rights for identity exist, and...
-    right.path == "*"               # Right.path is '*'.
-}
-
-allow {                             # Allow request if...
-    some right
-    identity_rights[right]          # Rights for identity exist, and...
-    right.path == input.path        # Right.path matches input.path.
-}
-
-x_opa := input.headers["X-Opa"][_]
-
-identity_rights[right] {             # Right is in the identity_rights set if...
-    token := tokens[x_opa]  # Token exists for identity, and...
-    role := token.roles[_]           # Token has a role, and...
-    right := rights[role]            # Role has rights defined.
+# Site admin should be able to see anything
+allow {
+    data.permissions.site_admin == true
 }
 
 # Any service should be able to verify that a service is who it says it is:
@@ -64,28 +17,31 @@ allow {
     input.method == "POST"
 }
 
+# Opa should be able to store its vault token
+allow {
+    input.path == ["v1", "data", "store_token"]
+    input.method == "PUT"
+    input.headers["X-Opa"][_] == data.opa_secret
+}
+
 # Service-info path for healthcheck
 allow {
     input.path == ["v1", "data", "service", "service-info"]
     input.method == "GET"
 }
 
-# Site admin should be able to see anything
-allow {
-    data.permissions.site_admin == true
+# The authx library uses these paths:
+authx_paths = {
+    "datasets": ["v1", "data", "permissions", "datasets"],
+    "allowed": ["v1", "data", "permissions", "allowed"],
+    "site_admin": ["v1", "data", "permissions", "site_admin"],
+    "user_id": ["v1", "data", "idp", "user_key"]
 }
 
-# As long as the user is authorized, should be able to get their own datasets
+# An authorized user has a valid token (and passes in that same token for both bearer and body)
+# Authz users can access the authx paths
 allow {
-    input.path == ["v1", "data", "permissions", "datasets"]
-    input.method == "POST"
-    data.permissions.valid_token == true
-    input.body.input.token == input.identity
-}
-
-# As long as the user is authorized, should be able to see if they're allowed to view something
-allow {
-    input.path == ["v1", "data", "permissions", "allowed"]
+    input.path == authx_paths[_]
     input.method == "POST"
     data.permissions.valid_token == true
     input.body.input.token == input.identity
