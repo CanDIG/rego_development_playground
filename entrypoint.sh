@@ -24,13 +24,15 @@ if [[ -f "/app/initial_setup" ]]; then
     python3 /app/initialize_vault_store.py
     if [[ $? -eq 0 ]]; then
         rm /app/initial_setup
-        rm /app/bearer.txt
         echo "setup complete"
     else
         echo "!!!!!! INITIALIZATION FAILED, TRY AGAIN !!!!!!"
     fi
 fi
 
+# make sure that our idp is still set correctly (maybe keycloak was reinitialized)
+python3 get_vault_store_token.py
+python3 /app/initialize_idp.py
 
 while [ 0 -eq 0 ]
 do
