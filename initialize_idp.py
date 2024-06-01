@@ -11,6 +11,7 @@ try:
         with open('/app/bearer.txt') as f:
             token = f.read().strip()
     if token is not None:
+        print("Updating our IDP with a new bearer token")
         response = add_provider_to_opa(token, os.getenv("KEYCLOAK_REALM_URL"))
         os.remove('/app/bearer.txt')
         if get_user_id(None, token=token) is None:
