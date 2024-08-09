@@ -243,47 +243,27 @@ def test_site_admin(user, expected_result, site_roles, users, programs):
 
 def get_user_datasets():
     return [
-        ( # site admin should be able to read all datasets
+        (  # site admin should be able to read all datasets
             "site_admin",
-            {
-                "body": {
-                  "path": "/ga4gh/drs/v1/cohorts/",
-                  "method": "GET"
-                }
-            },
-            ["SYNTHETIC-1", "SYNTHETIC-2", "SYNTHETIC-3", "SYNTHETIC-4"]
+            {"body": {"path": "/ga4gh/drs/v1/cohorts/", "method": "GET"}},
+            ["SYNTHETIC-1", "SYNTHETIC-2", "SYNTHETIC-3", "SYNTHETIC-4"],
         ),
-        ( # user1 can view the datasets it's a member of
+        (  # user1 can view the datasets it's a member of
             "user1",
-            {
-                "body": {
-                  "path": "/v2/discovery/programs/",
-                  "method": "GET"
-                }
-            },
-            ["SYNTHETIC-1", "SYNTHETIC-3", "SYNTHETIC-4"]
+            {"body": {"path": "/v3/discovery/programs/", "method": "GET"}},
+            ["SYNTHETIC-1", "SYNTHETIC-3", "SYNTHETIC-4"],
         ),
-        ( # user3 can view the datasets it's a member of + DAC programs,
-          # but SYNTHETIC-1's authorized dates are in the past
+        (  # user3 can view the datasets it's a member of + DAC programs,
+            # but SYNTHETIC-1's authorized dates are in the past
             "user3",
-            {
-                "body": {
-                  "path": "/v2/discovery/programs/",
-                  "method": "GET"
-                }
-            },
-            ["SYNTHETIC-3", "SYNTHETIC-4"]
+            {"body": {"path": "/v3/discovery/programs/", "method": "GET"}},
+            ["SYNTHETIC-3", "SYNTHETIC-4"],
         ),
         (
             "dac_user",
-            {
-                "body": {
-                  "path": "/ga4gh/drs/v1/cohorts",
-                  "method": "GET"
-                }
-            },
-            ["SYNTHETIC-3"]
-        )
+            {"body": {"path": "/ga4gh/drs/v1/cohorts", "method": "GET"}},
+            ["SYNTHETIC-3"],
+        ),
     ]
 
 
