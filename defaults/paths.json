@@ -2,16 +2,16 @@
     "paths": {
         "read": {
             "get": [
-                "/v2/discovery/?.*",
-                "/v2/authorized/?.*",
-                "/htsget/v1/variants/?.*",
-                "/htsget/v1/variants/search",
-                "/htsget/v1/reads/?.*",
-                "/htsget/v1/samples/?.*",
-                "/ga4gh/drs/v1/objects/?.*",
-                "/ga4gh/drs/v1/cohorts/?.*",
-                "/ga4gh/drs/v1/cohorts/?.*/status",
-                "/beacon/v2/g_variants/?.*"
+              "/v3/discovery/?.*",
+              "/v3/authorized/?.*",
+              "/htsget/v1/variants/?.*",
+              "/htsget/v1/variants/search",
+              "/htsget/v1/reads/?.*",
+              "/htsget/v1/samples/?.*",
+              "/ga4gh/drs/v1/objects/?.*",
+              "/ga4gh/drs/v1/cohorts/?.*",
+              "/ga4gh/drs/v1/cohorts/?.*/status",
+              "/beacon/v2/g_variants/?.*"
             ],
             "post": [
                 "/htsget/v1/variants/search",
@@ -20,22 +20,14 @@
             ]
         },
         "curate": {
-            "get": [
-                "/htsget/v1/variants/?.*/index",
-                "/htsget/v1/variants/?.*/verify",
-                "/htsget/v1/reads/?.*/index",
-                "/htsget/v1/reads/?.*/verify"
-            ],
-            "post": [
-                "/ingest/?.*",
-                "/ga4gh/drs/v1/?.*",
-                "/v2/ingest/?.*"
-            ],
-            "delete": [
-                "/ingest/?.*",
-                "/ga4gh/drs/v1/?.*",
-                "/v2/ingest/?.*"
-            ]
+          "get": [
+            "/htsget/v1/variants/?.*/index",
+            "/htsget/v1/variants/?.*/verify",
+            "/htsget/v1/reads/?.*/index",
+            "/htsget/v1/reads/?.*/verify"
+          ],
+          "post": ["/ingest/?.*", "/ga4gh/drs/v1/?.*", "/v3/ingest/?.*"],
+          "delete": ["/ingest/?.*", "/ga4gh/drs/v1/?.*", "/v3/ingest/?.*"]
         }
     }
 }
