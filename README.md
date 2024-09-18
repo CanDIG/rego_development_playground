@@ -9,7 +9,10 @@ Interactions with Vault are handled by [vault.rego](permissions_engine/vault.reg
 
 Authorization to endpoints in the OPA service itself is defined in [authz.rego](permissions_engine/authz.rego).
 
-* Role-based auth: Roles for the site are defined in the format given in [site_roles.json](defaults/site_roles.json). if the User is defined as a site admin, they are allowed to view any endpoint. Other site-based roles can be similarly defined.
+* Role-based auth: Roles for the site are defined in the format given in [site_roles.json](defaults/site_roles.json).
+  * If the User is defined as a site admin, they are allowed to access any endpoint.
+  * If the User is defined as a site curator, they are allowed to use any of the curate method/path combinations defined in [paths.json](defaults/paths.json) for all programs known to the system.
+  * Other site-based roles can be similarly defined.
 
 * Endpoint-based auth: Any service can use the `/service/verified` endpoint. Other specific endpoints can be similarly allowed.
 
