@@ -23,7 +23,9 @@ def site_roles():
       "admin": [
         "site_admin@test.ca"
       ],
-      "curator": [],
+      "curator": [
+        "user2@test.ca"
+      ],
       "local_team": [
         "user1@test.ca"
       ],
@@ -280,6 +282,17 @@ def get_curation_allowed():
                 "body": {
                   "path": "/ga4gh/drs/v1/cohorts/",
                   "method": "POST"
+                }
+            },
+            True
+        ),
+        ( # user2 can curate the datasets it's not a curator of because they're a site curator
+            "user2",
+            {
+                "body": {
+                  "path": "/ga4gh/drs/v1/cohorts/",
+                  "method": "POST",
+                  "program": "SYNTHETIC-1"
                 }
             },
             True

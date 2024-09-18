@@ -101,7 +101,32 @@ else := readable_programs
     regex.match(paths.read.post[_], input.body.path) == true
 }
 
-# if user is a program_curator, they can access programs that allow curate access for this method, path
+# if user is a site curator, they can access all programs that allow curate access for this method, path
+else := all_programs
+{
+    valid_token
+    user_key in site_roles.curator
+    input.body.method = "GET"
+    regex.match(paths.curate.get[_], input.body.path) == true
+}
+
+else := all_programs
+{
+    valid_token
+    user_key in site_roles.curator
+    input.body.method = "POST"
+    regex.match(paths.curate.post[_], input.body.path) == true
+}
+
+else := all_programs
+{
+    valid_token
+    user_key in site_roles.curator
+    input.body.method = "DELETE"
+    regex.match(paths.curate.delete[_], input.body.path) == true
+}
+
+# if user is a program_curator, they can access programs that allow curate access for them for this method, path
 else := curateable_programs
 {
     valid_token
