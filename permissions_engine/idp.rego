@@ -25,6 +25,23 @@ decode_verify_token(key, token) := output {
     )
 }
 
+decode_token(token) := output {
+    output := io.jwt.decode(token)
+}
+
+decoded_output := output {
+    possible_tokens := ["identity", "token"]
+    output := decode_token(input[possible_tokens[_]])
+}
+
+user_info := decoded_output[1]
+
+#
+# The user's key, as determined by this candig instance
+#
+user_key := user_info.CANDIG_USER_KEY
+
+
 #
 # If either input.identity or input.token are valid against an issuer, decode and verify
 #
@@ -49,11 +66,6 @@ token_issuer := i {
 valid_token = true {
     decode_verify_token_output[_][0]
 }
-
-#
-# The user's key, as determined by this candig instance
-#
-user_key := decode_verify_token_output[token_issuer][2].CANDIG_USER_KEY
 
 #
 # Check trusted_researcher in the token payload
