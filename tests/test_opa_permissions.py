@@ -188,6 +188,7 @@ def evaluate_opa(user, input, key, expected_result, site_roles, users, programs)
     args = [
         "./opa", "eval",
         "--data", "permissions_engine/authz.rego",
+        "--data", "permissions_engine/calculate.rego",
         "--data", "permissions_engine/permissions.rego",
     ]
     vault = setup_vault(user, site_roles, users, programs)
@@ -217,8 +218,8 @@ def evaluate_opa(user, input, key, expected_result, site_roles, users, programs)
                 print(json.dumps({"input": input}))
                 p = subprocess.run(args, stdout=subprocess.PIPE)
                 r =  json.loads(p.stdout)
-                print(r)
                 result =r['result'][0]['expressions'][0]['value']
+                print(result)
                 if key in result:
                     assert result[key] == expected_result
                 else:
