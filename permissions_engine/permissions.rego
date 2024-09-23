@@ -1,152 +1,22 @@
 package permissions
-#
-# This is the set of policy definitions for the permissions engine.
-#
-
-#
-# Provided:
-# input = {
-#     'token': user token
-#     'method': method requested at data service
-#     'path': path to request at data service
-#     'program': name of program (optional)
-# }
-#
-import data.idp.valid_token as valid_token
-import data.idp.user_key as user_key
 import future.keywords.in
 
 #
-# This user is a site admin if they have the site_admin role
+# Values that are used by authx
 #
-import data.vault.site_roles as site_roles
-site_admin = true {
-    user_key in site_roles.admin
+valid_token := true {
+    data.idp.valid_token
 }
+else := false
 
-#
-# what programs are available to this user?
-#
-
-import data.vault.all_programs as all_programs
-import data.vault.program_auths as program_auths
-import data.vault.user_programs as user_programs
-
-# compile list of programs specifically authorized for the user by DACs and within the authorized time period
-user_readable_programs[p["program_id"]] := output {
-    some p in user_programs
-    time.parse_ns("2006-01-02", p["start_date"]) <= time.now_ns()
-    time.parse_ns("2006-01-02", p["end_date"]) >= time.now_ns()
-    output := p
-}
-
-# compile list of programs that list the user as a team member
-team_readable_programs[p] := output {
-    some p in all_programs
-    user_key in program_auths[p].team_members
-    output := program_auths[p].team_members
-}
-
-# user can read programs that are either team-readable or user-readable
-readable_programs := object.keys(object.union(team_readable_programs, user_readable_programs))
-
-# user can curate programs that list the user as a program curator
-curateable_programs[p] {
-    some p in all_programs
-    user_key in program_auths[p].program_curators
-}
-
-import data.vault.paths as paths
-
-# debugging
-valid_token := valid_token
-readable_get[p] := output {
-    some p in paths.read.get
-    output := regex.match(p, input.body.path)
-}
-readable_post[p] := output {
-    some p in paths.read.post
-    output := regex.match(p, input.body.path)
-}
-curateable_get[p] := output {
-    some p in paths.curate.get
-    output := regex.match(p, input.body.path)
-}
-curateable_post[p] := output {
-    some p in paths.curate.post
-    output := regex.match(p, input.body.path)
-}
-
-# which datasets can this user see for this method, path
-default datasets = []
-
-# site admins can see all programs
-datasets := all_programs
-{
-    site_admin
-}
-
-# if user is a team_member, they can access programs that allow read access for this method, path
-else := readable_programs
-{
+site_admin := data.calculate.site_admin {
     valid_token
-    input.body.method = "GET"
-    regex.match(paths.read.get[_], input.body.path) == true
 }
 
-else := readable_programs
-{
+datasets := data.calculate.datasets {
     valid_token
-    input.body.method = "POST"
-    regex.match(paths.read.post[_], input.body.path) == true
 }
-
-# if user is a site curator, they can access all programs that allow curate access for this method, path
-else := all_programs
-{
-    valid_token
-    user_key in site_roles.curator
-    input.body.method = "GET"
-    regex.match(paths.curate.get[_], input.body.path) == true
-}
-
-else := all_programs
-{
-    valid_token
-    user_key in site_roles.curator
-    input.body.method = "POST"
-    regex.match(paths.curate.post[_], input.body.path) == true
-}
-
-else := all_programs
-{
-    valid_token
-    user_key in site_roles.curator
-    input.body.method = "DELETE"
-    regex.match(paths.curate.delete[_], input.body.path) == true
-}
-
-# if user is a program_curator, they can access programs that allow curate access for them for this method, path
-else := curateable_programs
-{
-    valid_token
-    input.body.method = "GET"
-    regex.match(paths.curate.get[_], input.body.path) == true
-}
-
-else := curateable_programs
-{
-    valid_token
-    input.body.method = "POST"
-    regex.match(paths.curate.post[_], input.body.path) == true
-}
-
-else := curateable_programs
-{
-    valid_token
-    input.body.method = "DELETE"
-    regex.match(paths.curate.delete[_], input.body.path) == true
-}
+else := []
 
 # convenience path: if a specific program is in the body, allowed = true if that program is in datasets
 allowed := true
@@ -158,3 +28,49 @@ else := true
     site_admin
 }
 
+
+#
+# User information, for decision log
+#
+
+# information from the jwt
+user_key := data.idp.user_key
+issuer := data.idp.user_info.iss
+
+#
+# Debugging information for decision log
+#
+
+user_is_site_admin := true {
+    user_key in data.vault.site_roles.admin
+}
+else := false
+
+user_is_site_curator := true {
+    user_key in data.vault.site_roles.curator
+}
+else := false
+
+# true if the path and method in the input match something in paths.json
+path_method_registered := true {
+    input.body.method = "GET"
+    object.union(data.calculate.readable_get, data.calculate.curateable_get)[_]
+}
+else := true {
+    input.body.method = "POST"
+    object.union(data.calculate.readable_post, data.calculate.curateable_post)[_]
+}
+else := true {
+    input.body.method = "DELETE"
+    data.calculate.curateable_delete[_]
+}
+else := false
+
+# programs the user is listed as a team member for
+team_member_programs := object.keys(data.calculate.team_readable_programs)
+
+# programs the user is approved by dac for
+dac_programs := object.keys(data.vault.user_programs)
+
+# programs the user is listed as a program curator for
+curator_programs := data.calculate.curateable_programs
