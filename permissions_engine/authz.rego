@@ -32,9 +32,7 @@ allow {
 
 # The authx library uses these paths:
 authx_paths = {
-    "datasets": ["v1", "data", "permissions", "datasets"],
-    "allowed": ["v1", "data", "permissions", "allowed"],
-    "site_admin": ["v1", "data", "permissions", "site_admin"],
+    "permissions": ["v1", "data", "permissions"],
     "user_id": ["v1", "data", "idp", "user_key"]
 }
 
