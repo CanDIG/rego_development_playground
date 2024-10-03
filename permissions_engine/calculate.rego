@@ -23,6 +23,10 @@ site_admin = true {
     user_key in site_roles.admin
 }
 
+site_curator = true {
+    user_key in site_roles.curator
+}
+
 #
 # what programs are available to this user?
 #

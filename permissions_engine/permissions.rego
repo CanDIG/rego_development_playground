@@ -13,12 +13,35 @@ site_admin := data.calculate.site_admin {
     valid_token
 }
 
+site_curator := data.calculate.site_curator {
+    valid_token
+}
+
 datasets := data.calculate.datasets {
     valid_token
 }
 else := []
 
-# convenience path: if a specific program is in the body, allowed = true if that program is in datasets
+
+# true if the path and method in the input match something in paths.json
+path_method_registered := true {
+    input.body.method = "GET"
+    object.union(data.calculate.readable_get, data.calculate.curateable_get)[_]
+}
+else := true {
+    input.body.method = "POST"
+    object.union(data.calculate.readable_post, data.calculate.curateable_post)[_]
+}
+else := true {
+    input.body.method = "DELETE"
+    data.calculate.curateable_delete[_]
+}
+else := false
+
+
+# if a specific program is in the body, allowed = true if that program is in datasets
+# or if the user is a site admin
+# or if the user is a site curator and wants to curate something
 allowed := true
 {
     input.body.program in datasets
@@ -26,6 +49,11 @@ allowed := true
 else := true
 {
     site_admin
+}
+else := true
+{
+    site_curator
+    path_method_registered
 }
 
 
@@ -48,21 +76,6 @@ else := false
 
 user_is_site_curator := true {
     user_key in data.vault.site_roles.curator
-}
-else := false
-
-# true if the path and method in the input match something in paths.json
-path_method_registered := true {
-    input.body.method = "GET"
-    object.union(data.calculate.readable_get, data.calculate.curateable_get)[_]
-}
-else := true {
-    input.body.method = "POST"
-    object.union(data.calculate.readable_post, data.calculate.curateable_post)[_]
-}
-else := true {
-    input.body.method = "DELETE"
-    data.calculate.curateable_delete[_]
 }
 else := false
 
