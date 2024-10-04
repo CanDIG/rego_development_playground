@@ -2,8 +2,8 @@
     "paths": {
         "read": {
             "get": [
-                "/v2/discovery/?.*",
-                "/v2/authorized/?.*",
+                "/v3/discovery/?.*",
+                "/v3/authorized/?.*",
                 "/htsget/v1/variants/?.*",
                 "/htsget/v1/variants/search",
                 "/htsget/v1/reads/?.*",
@@ -21,20 +21,27 @@
         },
         "curate": {
             "get": [
+                "/ingest/?.*",
                 "/htsget/v1/variants/?.*/index",
                 "/htsget/v1/variants/?.*/verify",
                 "/htsget/v1/reads/?.*/index",
                 "/htsget/v1/reads/?.*/verify"
             ],
             "post": [
-                "/ingest/?.*",
+                "/ingest/s3-credential/?.*",
+                "/ingest/program/?.*",
+                "/ingest/user/?.*",
+                "/ingest/genomic",
+                "/ingest/clinical",
                 "/ga4gh/drs/v1/?.*",
-                "/v2/ingest/?.*"
+                "/v3/ingest/?.*"
             ],
             "delete": [
-                "/ingest/?.*",
+                "/ingest/s3-credential/?.*",
+                "/ingest/program/?.*",
+                "/ingest/user/?.*",
                 "/ga4gh/drs/v1/?.*",
-                "/v2/ingest/?.*"
+                "/v3/ingest/?.*"
             ]
         }
     }

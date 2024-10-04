@@ -23,7 +23,9 @@ def site_roles():
       "admin": [
         "site_admin@test.ca"
       ],
-      "curator": [],
+      "curator": [
+        "user2@test.ca"
+      ],
       "local_team": [
         "user1@test.ca"
       ],
@@ -186,6 +188,7 @@ def evaluate_opa(user, input, key, expected_result, site_roles, users, programs)
     args = [
         "./opa", "eval",
         "--data", "permissions_engine/authz.rego",
+        "--data", "permissions_engine/calculate.rego",
         "--data", "permissions_engine/permissions.rego",
     ]
     vault = setup_vault(user, site_roles, users, programs)
@@ -215,8 +218,8 @@ def evaluate_opa(user, input, key, expected_result, site_roles, users, programs)
                 print(json.dumps({"input": input}))
                 p = subprocess.run(args, stdout=subprocess.PIPE)
                 r =  json.loads(p.stdout)
-                print(r)
                 result =r['result'][0]['expressions'][0]['value']
+                print(result)
                 if key in result:
                     assert result[key] == expected_result
                 else:
@@ -243,47 +246,27 @@ def test_site_admin(user, expected_result, site_roles, users, programs):
 
 def get_user_datasets():
     return [
-        ( # site admin should be able to read all datasets
+        (  # site admin should be able to read all datasets
             "site_admin",
-            {
-                "body": {
-                  "path": "/ga4gh/drs/v1/cohorts/",
-                  "method": "GET"
-                }
-            },
-            ["SYNTHETIC-1", "SYNTHETIC-2", "SYNTHETIC-3", "SYNTHETIC-4"]
+            {"body": {"path": "/ga4gh/drs/v1/cohorts/", "method": "GET"}},
+            ["SYNTHETIC-1", "SYNTHETIC-2", "SYNTHETIC-3", "SYNTHETIC-4"],
         ),
-        ( # user1 can view the datasets it's a member of
+        (  # user1 can view the datasets it's a member of
             "user1",
-            {
-                "body": {
-                  "path": "/v2/discovery/programs/",
-                  "method": "GET"
-                }
-            },
-            ["SYNTHETIC-1", "SYNTHETIC-3", "SYNTHETIC-4"]
+            {"body": {"path": "/v3/discovery/programs/", "method": "GET"}},
+            ["SYNTHETIC-1", "SYNTHETIC-3", "SYNTHETIC-4"],
         ),
-        ( # user3 can view the datasets it's a member of + DAC programs,
-          # but SYNTHETIC-1's authorized dates are in the past
+        (  # user3 can view the datasets it's a member of + DAC programs,
+            # but SYNTHETIC-1's authorized dates are in the past
             "user3",
-            {
-                "body": {
-                  "path": "/v2/discovery/programs/",
-                  "method": "GET"
-                }
-            },
-            ["SYNTHETIC-3", "SYNTHETIC-4"]
+            {"body": {"path": "/v3/discovery/programs/", "method": "GET"}},
+            ["SYNTHETIC-3", "SYNTHETIC-4"],
         ),
         (
             "dac_user",
-            {
-                "body": {
-                  "path": "/ga4gh/drs/v1/cohorts",
-                  "method": "GET"
-                }
-            },
-            ["SYNTHETIC-3"]
-        )
+            {"body": {"path": "/ga4gh/drs/v1/cohorts", "method": "GET"}},
+            ["SYNTHETIC-3"],
+        ),
     ]
 
 
@@ -300,6 +283,17 @@ def get_curation_allowed():
                 "body": {
                   "path": "/ga4gh/drs/v1/cohorts/",
                   "method": "POST"
+                }
+            },
+            True
+        ),
+        ( # user2 can curate the datasets it's not a curator of because they're a site curator
+            "user2",
+            {
+                "body": {
+                  "path": "/ga4gh/drs/v1/cohorts/",
+                  "method": "POST",
+                  "program": "SYNTHETIC-1"
                 }
             },
             True
