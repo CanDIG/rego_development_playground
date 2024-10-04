@@ -71,6 +71,11 @@ else := true
     site_curator
     curateable_method_path
 }
+else := true
+{
+    site_curator
+    readable_method_path
+}
 
 
 #
