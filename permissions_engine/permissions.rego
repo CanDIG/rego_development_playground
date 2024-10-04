@@ -23,14 +23,30 @@ datasets := data.calculate.datasets {
 else := []
 
 
-# true if the path and method in the input match something in paths.json
-path_method_registered := true {
+# true if the path and method in the input match a readable combo in paths.json
+readable_method_path := true {
     input.body.method = "GET"
-    object.union(data.calculate.readable_get, data.calculate.curateable_get)[_]
+    data.calculate.readable_get[_]
 }
 else := true {
     input.body.method = "POST"
-    object.union(data.calculate.readable_post, data.calculate.curateable_post)[_]
+    data.calculate.readable_post[_]
+}
+else := true {
+    input.body.method = "DELETE"
+    data.calculate.curateable_delete[_]
+}
+else := false
+
+
+# true if the path and method in the input match a curateable combo in paths.json
+curateable_method_path := true {
+    input.body.method = "GET"
+    data.calculate.curateable_get[_]
+}
+else := true {
+    input.body.method = "POST"
+    data.calculate.curateable_post[_]
 }
 else := true {
     input.body.method = "DELETE"
@@ -53,7 +69,12 @@ else := true
 else := true
 {
     site_curator
-    path_method_registered
+    curateable_method_path
+}
+else := true
+{
+    site_curator
+    readable_method_path
 }
 
 

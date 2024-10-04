@@ -4,14 +4,10 @@
             "SITE_ADMIN_USER"
         ],
         "curator": [
-            "USER2"
         ],
         "local_team": [
-            "USER1"
         ],
         "mohccn_network": [
-            "USER1",
-            "USER2"
         ]
     }
 }
