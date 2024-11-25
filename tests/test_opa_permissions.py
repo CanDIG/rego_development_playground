@@ -248,7 +248,7 @@ def get_user_datasets():
     return [
         (  # site admin should be able to read all datasets
             "site_admin",
-            {"body": {"path": "/ga4gh/drs/v1/cohorts/", "method": "GET"}},
+            {"body": {"path": "/ga4gh/drs/v1/programs/", "method": "GET"}},
             ["SYNTHETIC-1", "SYNTHETIC-2", "SYNTHETIC-3", "SYNTHETIC-4"],
         ),
         (  # user1 can view the datasets it's a member of
@@ -264,7 +264,7 @@ def get_user_datasets():
         ),
         (
             "dac_user",
-            {"body": {"path": "/ga4gh/drs/v1/cohorts", "method": "GET"}},
+            {"body": {"path": "/ga4gh/drs/v1/programs", "method": "GET"}},
             ["SYNTHETIC-3"],
         ),
     ]
@@ -281,7 +281,7 @@ def get_curation_allowed():
             "site_admin",
             {
                 "body": {
-                  "path": "/ga4gh/drs/v1/cohorts/",
+                  "path": "/ga4gh/drs/v1/programs/",
                   "method": "POST"
                 }
             },
@@ -291,7 +291,7 @@ def get_curation_allowed():
             "user2",
             {
                 "body": {
-                  "path": "/ga4gh/drs/v1/cohorts/",
+                  "path": "/ga4gh/drs/v1/programs/",
                   "method": "POST",
                   "program": "SYNTHETIC-1"
                 }
@@ -302,7 +302,7 @@ def get_curation_allowed():
             "user1",
             {
                 "body": {
-                  "path": "/ga4gh/drs/v1/cohorts/",
+                  "path": "/ga4gh/drs/v1/programs/",
                   "method": "POST",
                   "program": "SYNTHETIC-1"
                 }
@@ -313,7 +313,7 @@ def get_curation_allowed():
             "user1",
             {
                 "body": {
-                  "path": "/ga4gh/drs/v1/cohorts/",
+                  "path": "/ga4gh/drs/v1/programs/",
                   "method": "DELETE",
                   "program": "SYNTHETIC-1"
                 }
@@ -324,7 +324,7 @@ def get_curation_allowed():
             "user1",
             {
                 "body": {
-                  "path": "/ga4gh/drs/v1/cohorts/",
+                  "path": "/ga4gh/drs/v1/programs/",
                   "method": "POST",
                   "program": "SYNTHETIC-2"
                 }
