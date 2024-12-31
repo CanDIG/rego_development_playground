@@ -1,12 +1,13 @@
 package service
+
 #
 # Verifies that a service is who it says it is
 #
-
 import data.vault.service_token as service_token
+import rego.v1
 
-verified {
-    service_token == input.token
+verified if {
+	service_token == input.token
 }
 
-service-info := "opa service is running"
+minus(service, info) := "opa service is running"
