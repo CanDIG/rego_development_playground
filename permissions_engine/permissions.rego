@@ -69,6 +69,10 @@ allowed if {
 }
 
 else if {
+	input.body.program in datasets
+}
+
+else if {
 	site_admin
 }
 
