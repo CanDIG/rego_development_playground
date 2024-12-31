@@ -28,7 +28,7 @@ USER candig
 
 WORKDIR /app/
 
-RUN curl -L -o opa https://openpolicyagent.org/downloads/v0.63.0/opa_linux_amd64_static
+RUN curl -L -o opa https://openpolicyagent.org/downloads/v1.0.0/opa_linux_amd64_static
 
 RUN chmod 755 ./opa
 
