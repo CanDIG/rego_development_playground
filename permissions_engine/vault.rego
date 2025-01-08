@@ -35,3 +35,5 @@ default user_programs := []
 user_programs := user_auth.body.data.programs if {
 	user_auth.status_code = 200
 }
+
+user_frontend_auth := user_auth.status_code == 200

@@ -82,7 +82,7 @@ else if {
 }
 
 else if {
-	site_curator
+	data.vault.user_frontend_auth
 	readable_method_path
 }
 
