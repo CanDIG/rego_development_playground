@@ -11,7 +11,8 @@
                 "/ga4gh/drs/v1/objects/?.*",
                 "/ga4gh/drs/v1/programs/?.*",
                 "/ga4gh/drs/v1/programs/?.*/status",
-                "/beacon/v2/g_variants/?.*"
+                "/beacon/v2/g_variants/?.*",
+                "/query/?.*"
             ],
             "post": [
                 "/htsget/v1/variants/search",
